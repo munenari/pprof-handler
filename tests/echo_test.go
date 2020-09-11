@@ -22,3 +22,18 @@ func TestEchoHandler(t *testing.T) {
 		t.Fatal("failed to get pprof")
 	}
 }
+
+func TestEchoHandlerWithCustomPath(t *testing.T) {
+	t.Parallel()
+	e := echo.New()
+	e.Any("/stage/api/debug-internal/secret/*", echo.WrapHandler(pprofhandler.Handler("/debug-internal/secret/")))
+	defer e.Close()
+	go e.Start("")
+	for e.Listener == nil {
+		time.Sleep(1)
+	}
+	u := "http://" + e.Listener.Addr().String() + "/stage/api/debug-internal/secret/goroutine?debug=1"
+	if success := check200(u); !success {
+		t.Fatal("failed to get pprof")
+	}
+}

@@ -65,3 +65,47 @@ func TestSplitPprofName(t *testing.T) {
 		})
 	}
 }
+
+func TestBuildHandlerPath(t *testing.T) {
+	t.Parallel()
+	values := []struct {
+		vars   []string
+		result string
+	}{
+		{
+			vars:   []string{"debug", "pprof"},
+			result: "/debug/pprof/",
+		},
+		{
+			vars:   []string{},
+			result: "",
+		},
+		{
+			vars:   []string{""},
+			result: "",
+		},
+		{
+			vars:   []string{"/debug/pprof/"},
+			result: "/debug/pprof/",
+		},
+		{
+			vars:   []string{"debug/pprof"},
+			result: "/debug/pprof/",
+		},
+		{
+			vars:   []string{"debug", "pprof", "testing-path"},
+			result: "/debug/pprof/testing-path/",
+		},
+	}
+	for i, v := range values {
+		vv := v
+		caption := fmt.Sprintf("[%d] %s:%s", i, vv.vars, vv.result)
+		t.Run(caption, func(tt *testing.T) {
+			tt.Parallel()
+			s := buildHandlerPath(vv.vars)
+			if s != vv.result {
+				tt.Fatal("path was not match (s, vv.result)", s, vv.result)
+			}
+		})
+	}
+}

@@ -9,7 +9,7 @@ import (
 
 func TestHttpHandler(t *testing.T) {
 	t.Parallel()
-	h := pprofhandler.Handler("/debug/pprof/")
+	h := pprofhandler.Handler()
 	s := httptest.NewServer(h)
 	defer s.Close()
 	if success := check200(s.URL + "/debug/pprof/heap?debug=1"); !success {

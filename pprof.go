@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/pprof"
+	"path"
 	"strings"
 )
 
@@ -13,8 +14,9 @@ var (
 )
 
 // Handler returns an HTTP handler that serves with base path
-func Handler(basePath string) http.Handler {
-	return handler(basePath)
+// if no vars, this will be set "/debug/pprof/"
+func Handler(basePaths ...string) http.Handler {
+	return handler(buildHandlerPath(basePaths))
 }
 
 type handler string
@@ -62,4 +64,15 @@ func splitPprofName(pathStr, basePath string) (name string, err error) {
 	}
 	name = splitted[1]
 	return
+}
+
+func buildHandlerPath(p []string) string {
+	if len(p) == 0 {
+		return ""
+	}
+	if len(p) == 1 && p[0] == "" {
+		return ""
+	}
+	s := strings.Trim(path.Join(p...), "/")
+	return "/" + s + "/"
 }
